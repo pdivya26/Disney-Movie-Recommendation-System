@@ -3,6 +3,8 @@ from PIL import Image, ImageTk
 from tkinter import messagebox, ttk
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
@@ -13,7 +15,7 @@ global t_entry, g_entry, tree, root, root1, root2
 windows = []
 
 # Load the dataset
-file_path = r'C:\Users\divya\Documents\Academics\Coding\DWM\DisneyMoviesDataset.csv'  
+file_path = r'C:\Users\divya\Documents\Academics\Datasets\DisneyMovies.csv'  
 data = pd.read_csv(file_path)
 
 # Data preprocessing
@@ -49,16 +51,28 @@ y = (data_cleaned['IMDb'] >= 7.0).astype(int)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 # Train Naive Bayes model
-model_nb = GaussianNB()
-model_nb.fit(X_train, y_train)
+# model_nb = GaussianNB()
+# model_nb.fit(X_train, y_train)
+
+model_mnb = MultinomialNB()
+model_mnb.fit(X_train, y_train)
+
+# model_bnb = BernoulliNB()
+# model_bnb.fit(X_train, y_train)
 
 # Train Decision Tree model
-model_dt = DecisionTreeClassifier(random_state=50)
+#model_dt = DecisionTreeClassifier(random_state=50)
+model_dt = DecisionTreeClassifier(
+    max_depth=5,            # Limit tree depth to prevent overfitting
+    min_samples_split=10,   # A node must have at least 10 samples to split
+    min_samples_leaf=5,     # A leaf node must have at least 5 samples
+    random_state=50
+)
 model_dt.fit(X_train, y_train)
 
 # Function to recommend movies using Naive Bayes
 def naivebayes_recommend(user_input, top_n=10):
-    return recommend_movies(user_input, top_n, model_nb)
+    return recommend_movies(user_input, top_n, model_mnb)
 
 # Function to recommend movies using Decision Tree
 def decision_tree_recommend(user_input, top_n=10):
@@ -330,7 +344,7 @@ def g_recommend_dt():
         messagebox.showerror("Error", "Sorry, Genre doesn't exist in our database!")
 
 def comp_alg():
-    global model_nb, model_dt, X_test, y_test
+    global model_mnb, model_dt, X_test, y_test
 
     root3=Tk()
     root3.title("Movie Recommendation System")
@@ -340,7 +354,7 @@ def comp_alg():
     windows.append(root3)
     
     # Calculate accuracies
-    nb_accuracy = model_nb.score(X_test, y_test) * 100
+    mnb_accuracy = model_mnb.score(X_test, y_test) * 100
     dt_accuracy = model_dt.score(X_test, y_test) * 100
 
     # Create input frame
@@ -352,18 +366,18 @@ def comp_alg():
     title.pack()
 
     # Create label and entry for user input
-    nb_acc = Label(root3, text=f"Naive Bayes Accuracy: {nb_accuracy:.2f}%", bg="#333333", fg="white", font=("Helvetica", 14, 'bold'))
+    nb_acc = Label(root3, text=f"Naive Bayes Accuracy: {mnb_accuracy:.2f}%", bg="#333333", fg="white", font=("Helvetica", 14, 'bold'))
     nb_acc.place(x=30, y=50)
 
     dt_acc = Label(root3, text=f"Decision Tree Accuracy: {dt_accuracy:.2f}%", bg="#333333", fg="white", font=("Helvetica", 14, 'bold'))
     dt_acc.place(x=20, y=100)
 
-    clr = Button(root3, text="Ok", font=("Arial", 14, 'bold'), width=8, height=1, bg="white", command=lambda: root3.destroy())
+    clr = Button(root3, text="OK", font=("Arial", 14, 'bold'), width=8, height=1, bg="white", command=lambda: root3.destroy())
     clr.place(x=120, y=150)
 
 ##    # Display results in a messagebox
 ##    messagebox.showinfo("Algorithm Comparison", 
-##                        f"Naive Bayes Accuracy: {nb_accuracy:.2f}%\n"
+##                        f"Naive Bayes Accuracy: {mnb_accuracy:.2f}%\n"
 ##                        f"Decision Tree Accuracy: {dt_accuracy:.2f}%")
 
 def random_movies():
@@ -460,7 +474,7 @@ def close():
         root.destroy()
         
 root=Tk()
-root.title("Movie Recommendation System")
+root.title("Disney Movie Recommendation System")
 root.geometry(f"1200x673+{150}+{50}")
 
 img = Image.open("DisneyBg.png")
@@ -486,4 +500,3 @@ root.protocol("WM_DELETE_WINDOW", close)
 
 root.resizable(False,False)
 root.mainloop()
-
