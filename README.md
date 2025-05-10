@@ -17,6 +17,25 @@ An intelligent movie recommendation system built using machine learning models t
   - **Decision Tree:** For rule-based, interpretable recommendations.
 - **Tkinter GUI:** User-friendly interface for inputs and displaying results.
 
+## **Setup Instructions**  
+ 
+**Clone the repository or download the ZIP**  
+```
+git clone https://github.com/pdivya26/Disney-Movie-Recommendation-System.git  
+cd disney-movie-recommendation-system  
+```
+
+
+**Install dependencies**  
+```
+pip install -r requirements.txt
+```
+
+**Run the Flask app**  
+```
+python DisneyMovieRecommendationSystem.py
+```
+
 ## Implementation Screenshots
 
 ![image](https://github.com/user-attachments/assets/c7dab488-beca-4405-9bda-fa35f142b1fa)
